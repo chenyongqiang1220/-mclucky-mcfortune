@@ -1,0 +1,20 @@
+{
+  "$comment": "脱敏配置示例。Token 只允许用 ${MCP_TOKEN} 环境变量占位符，真实 Token 写在 .env 里，.env 已被 .gitignore 排除。",
+  "mcpServers": {
+    "mcd-mcp": {
+      "type": "streamablehttp",
+      "url": "https://mcp.mcd.cn",
+      "headers": {
+        "Authorization": "Bearer ${MCP_TOKEN}"
+      },
+      "disabled": false
+    }
+  },
+  "app": {
+    "orderType": 1,
+    "beType": 1,
+    "note": "1=到店自提（本项目只用这一种，到店自提不需要 beCode）",
+    "budgetRange": [15, 120],
+    "moods": ["energetic", "tired", "emo", "date", "celebrate", "whatever"]
+  }
+}

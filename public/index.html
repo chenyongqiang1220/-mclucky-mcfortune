@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<meta name="theme-color" content="#DA291C" />
+<title>麦门今日运势 · 每日一签点餐搭子</title>
+<style>
+  :root {
+    --mcd-red: #DA291C;
+    --mcd-red-dark: #A81D14;
+    --mcd-yellow: #FFC72C;
+    --ink: #1F1B18;
+    --ink-soft: #6B615B;
+    --paper: #FFF8EF;
+    --card: #FFFFFF;
+    --line: #F0E3D6;
+    --shadow: 0 6px 20px rgba(218, 41, 28, .12);
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    min-height: 100vh;
+    padding-bottom: 40px;
+  }
+  .wrap { max-width: 480px; margin: 0 auto; padding: 0 16px; }
+
+  /* ---------- Header ---------- */
+  /* header 放在 .wrap 容器内，与下方卡片共用同一列宽：
+     手机端随屏宽收缩、桌面端锁定 480px，左右边缘永远和卡片对齐 */
+  .wrap > header { margin-top: 14px; }
+  header {
+    background: linear-gradient(160deg, var(--mcd-red) 0%, var(--mcd-red-dark) 100%);
+    color: #fff;
+    padding: 20px 18px 22px;
+    border-radius: 22px;
+    box-shadow: var(--shadow);
+  }
+  .logo { font-size: 21px; font-weight: 800; letter-spacing: .5px; display: flex; align-items: center; gap: 8px; }
+  .logo .gold { color: var(--mcd-yellow); }
+  .sub { font-size: 12.5px; opacity: .88; margin-top: 6px; line-height: 1.5; }
+
+  /* 小屏手机（≤360px）：收紧 header 内边距，防止文案换行挤压 */
+  @media (max-width: 360px) {
+    header { padding: 16px 14px 18px; border-radius: 18px; }
+    .logo { font-size: 19px; }
+    .sub { font-size: 12px; }
+  }
+  /* 平板 / 桌面大屏（≥560px）：整列下沉一点，视觉更聚焦 */
+  @media (min-width: 560px) {
+    .wrap > header { margin-top: 22px; }
+  }
+  /* iOS 刘海屏：顶部间距至少吃到安全区高度 */
+  @supports (padding: max(0px)) {
+    .wrap > header { margin-top: max(14px, env(safe-area-inset-top)); }
+  }
+  .logo { font-size: 21px; font-weight: 800; letter-spacing: .5px; display: flex; align-items: center; gap: 8px; }
+  .logo .gold { color: var(--mcd-yellow); }
+  .sub { font-size: 12.5px; opacity: .88; margin-top: 6px; line-height: 1.5; }
+
+  /* ---------- Section ---------- */
+  .section { background: var(--card); border-radius: 18px; padding: 18px; margin-top: 14px; box-shadow: var(--shadow); }
+  .step { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+  .step .num {
+    width: 22px; height: 22px; border-radius: 50%;
+    background: var(--mcd-red); color: #fff;
+    font-size: 12px; font-weight: 700; display: grid; place-items: center; flex: none;
+  }
+  .step h2 { font-size: 15px; margin: 0; font-weight: 700; }
+  .step .tip { font-size: 12px; color: var(--ink-soft); margin-left: auto; }
+
+  /* ---------- Mood ---------- */
+  .moods { display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px; }
+  .mood {
+    border: 2px solid var(--line); background: #fff; border-radius: 14px;
+    padding: 12px 4px 10px; text-align: center; cursor: pointer;
+    transition: .16s; font-family: inherit;
+  }
+  .mood .emo { font-size: 24px; line-height: 1.1; display: block; }
+  .mood .lb { font-size: 13px; font-weight: 700; margin-top: 5px; display: block; }
+  .mood .hint { font-size: 10.5px; color: var(--ink-soft); margin-top: 3px; display: block; line-height: 1.35; }
+  .mood:active { transform: scale(.96); }
+  .mood.on { border-color: var(--mcd-red); background: #FFF1EF; box-shadow: 0 0 0 3px rgba(218,41,28,.09); }
+  .mood.on .lb { color: var(--mcd-red); }
+
+  /* ---------- Budget ---------- */
+  .budget-row { display: flex; align-items: baseline; gap: 6px; margin-bottom: 6px; }
+  .budget-row .val { font-size: 30px; font-weight: 800; color: var(--mcd-red); }
+  .budget-row .unit { font-size: 14px; font-weight: 700; color: var(--mcd-red); }
+  .budget-row .note { font-size: 12px; color: var(--ink-soft); margin-left: auto; }
+  input[type=range] {
+    width: 100%; -webkit-appearance: none; appearance: none;
+    height: 6px; border-radius: 3px; outline: none; margin: 12px 0 4px;
+    background: linear-gradient(90deg, var(--mcd-yellow), var(--mcd-red));
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none;
+    width: 26px; height: 26px; border-radius: 50%;
+    background: #fff; border: 3px solid var(--mcd-red); cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0,0,0,.18);
+  }
+  input[type=range]::-moz-range-thumb {
+    width: 22px; height: 22px; border-radius: 50%;
+    background: #fff; border: 3px solid var(--mcd-red); cursor: pointer;
+  }
+  .scale { display: flex; justify-content: space-between; font-size: 11px; color: var(--ink-soft); }
+
+  /* ---------- Location ---------- */
+  .loc-btn {
+    width: 100%; border: 2px dashed var(--mcd-red); background: #FFF6F4; color: var(--mcd-red);
+    font-size: 14px; font-weight: 700; padding: 13px; border-radius: 14px; cursor: pointer; font-family: inherit;
+  }
+  .loc-btn:active { transform: scale(.98); }
+  .loc-status { font-size: 12.5px; margin-top: 9px; color: var(--ink-soft); line-height: 1.5; }
+  .loc-status b { color: var(--ink); }
+  .manual { margin-top: 12px; display: none; }
+  .manual.show { display: block; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+  .field { margin-bottom: 9px; }
+  .field label { font-size: 11.5px; color: var(--ink-soft); display: block; margin-bottom: 4px; }
+  .field input {
+    width: 100%; border: 1.5px solid var(--line); border-radius: 10px;
+    padding: 10px 11px; font-size: 14px; font-family: inherit; background: #fff; color: var(--ink);
+  }
+  .field input:focus { outline: none; border-color: var(--mcd-red); }
+  .link { font-size: 12px; color: var(--mcd-red); cursor: pointer; text-decoration: underline; background: none; border: 0; font-family: inherit; padding: 0; }
+
+  /* ---------- CTA ---------- */
+  .cta {
+    width: 100%; margin-top: 18px; padding: 17px;
+    background: linear-gradient(135deg, var(--mcd-yellow), #FFB000);
+    color: #6B3A00; font-size: 17px; font-weight: 800; border: 0; border-radius: 16px;
+    cursor: pointer; font-family: inherit; box-shadow: 0 6px 18px rgba(255, 183, 0, .45);
+    letter-spacing: .5px;
+  }
+  .cta:active { transform: scale(.98); }
+  .cta:disabled { opacity: .55; cursor: not-allowed; box-shadow: none; }
+
+  /* ---------- Result ---------- */
+  #result { display: none; }
+  .sig {
+    background: linear-gradient(165deg, var(--mcd-red) 0%, var(--mcd-red-dark) 100%);
+    border-radius: 20px; padding: 22px 18px; color: #fff; text-align: center;
+    box-shadow: var(--shadow); position: relative; overflow: hidden;
+  }
+  .sig::after {
+    content: ''; position: absolute; right: -50px; top: -50px;
+    width: 170px; height: 170px; border-radius: 50%;
+    background: rgba(255, 199, 44, .13);
+  }
+  .sig .date { font-size: 11.5px; opacity: .85; letter-spacing: 1px; }
+  .sig .mood-tag {
+    display: inline-block; margin-top: 9px; padding: 4px 12px; border-radius: 999px;
+    background: rgba(255,255,255,.16); font-size: 12px; font-weight: 600;
+  }
+  .sig .level {
+    font-size: 54px; font-weight: 900; color: var(--mcd-yellow);
+    margin: 12px 0 4px; letter-spacing: 3px; text-shadow: 0 3px 10px rgba(0,0,0,.22);
+  }
+  .sig .line { font-size: 16px; line-height: 1.65; padding: 0 6px; font-weight: 500; }
+  .yz { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin-top: 16px; }
+  .yz div {
+    background: rgba(255,255,255,.13); border-radius: 12px; padding: 10px 8px;
+    font-size: 13px; font-weight: 600; line-height: 1.4;
+  }
+  .yz .k { display: block; font-size: 11px; opacity: .75; margin-bottom: 3px; font-weight: 500; }
+
+  .combo-item { display: flex; align-items: center; gap: 12px; padding: 11px 0; border-bottom: 1px dashed var(--line); }
+  .combo-item:last-child { border-bottom: 0; }
+  .combo-item img { width: 56px; height: 56px; border-radius: 12px; object-fit: cover; background: #F7EFE7; flex: none; }
+  .combo-item .info { flex: 1; min-width: 0; }
+  .combo-item .nm { font-size: 14.5px; font-weight: 700; line-height: 1.35; }
+  .combo-item .tag { font-size: 11px; color: var(--ink-soft); margin-top: 3px; }
+  .combo-item .pr { font-size: 15px; font-weight: 800; color: var(--mcd-red); flex: none; }
+  .combo-item .pr del { display: block; font-size: 11px; color: var(--ink-soft); font-weight: 400; }
+
+  .price-box {
+    background: #FFF6E3; border: 1.5px solid #FFE0A3; border-radius: 14px;
+    padding: 15px; text-align: center; margin-top: 14px;
+  }
+  .price-box .final { font-size: 34px; font-weight: 900; color: var(--mcd-red); }
+  .price-box .final small { font-size: 15px; }
+  .price-box .meta { font-size: 12.5px; color: var(--ink-soft); margin-top: 5px; }
+  .price-box .meta b { color: var(--mcd-red); }
+
+  .cp-list { display: flex; flex-direction: column; gap: 7px; margin-top: 11px; }
+  .cp {
+    background: #FFF1EF; border-left: 3px solid var(--mcd-red);
+    border-radius: 8px; padding: 8px 11px; font-size: 12.5px; line-height: 1.45;
+  }
+  .cp .t { font-weight: 700; }
+  .cp .s { color: var(--ink-soft); font-size: 11.5px; }
+  .empty { font-size: 12.5px; color: var(--ink-soft); line-height: 1.6; }
+
+  .store-row { display: flex; gap: 10px; align-items: flex-start; }
+  .store-row .pin { font-size: 18px; flex: none; }
+  .store-row .nm { font-size: 14px; font-weight: 700; line-height: 1.4; }
+  .store-row .ad { font-size: 12px; color: var(--ink-soft); margin-top: 3px; line-height: 1.5; }
+  .store-row .dist {
+    display: inline-block; margin-top: 5px; font-size: 11.5px; font-weight: 700;
+    color: var(--mcd-red); background: #FFF1EF; border-radius: 6px; padding: 2px 8px;
+  }
+
+  .warn { background: #FFF9E8; border: 1px solid #F2E0B0; border-radius: 12px; padding: 11px 13px; }
+  .warn .t { font-size: 12px; font-weight: 700; color: #96700C; margin-bottom: 5px; }
+  .warn ul { margin: 0; padding-left: 17px; font-size: 12px; color: #7A5B08; line-height: 1.6; }
+
+  .share-btn {
+    width: 100%; margin-top: 14px; padding: 15px; background: var(--ink); color: #fff;
+    border: 0; border-radius: 14px; font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit;
+  }
+  .share-btn:active { transform: scale(.98); }
+  .share-btn:disabled { opacity: .5; }
+
+  .loading { text-align: center; padding: 34px 0; color: var(--ink-soft); font-size: 13px; }
+  .spinner {
+    width: 30px; height: 30px; border: 3px solid var(--line); border-top-color: var(--mcd-red);
+    border-radius: 50%; margin: 0 auto 12px; animation: spin .8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  footer { text-align: center; font-size: 11px; color: var(--ink-soft); margin-top: 22px; line-height: 1.7; padding: 0 20px; }
+  .toast {
+    position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%);
+    background: rgba(31,27,24,.92); color: #fff; font-size: 13px;
+    padding: 10px 18px; border-radius: 10px; z-index: 99; opacity: 0; pointer-events: none;
+    transition: opacity .22s; max-width: 84vw; text-align: center;
+  }
+  .toast.show { opacity: 1; }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <header>
+    <div class="logo">🍔 麦门<span class="gold">今日运势</span></div>
+    <div class="sub">选心情、定预算、定个位，抽一支今天的麦门签<br />顺便把吃什么、去哪吃、能省多少一起算明白</div>
+  </header>
+
+  <!-- 1. 心情 -->
+  <div class="section">
+    <div class="step"><span class="num">1</span><h2>今天什么心情</h2><span class="tip" id="moodTip"></span></div>
+    <div class="moods" id="moods"></div>
+  </div>
+
+  <!-- 2. 预算 -->
+  <div class="section">
+    <div class="step"><span class="num">2</span><h2>今天打算花多少</h2></div>
+    <div class="budget-row">
+      <span class="val" id="budgetVal">40</span><span class="unit">元</span>
+      <span class="note" id="budgetNote"></span>
+    </div>
+    <input type="range" id="budget" min="15" max="120" step="1" value="40" />
+    <div class="scale"><span>15 元</span><span>120 元</span></div>
+  </div>
+
+  <!-- 3. 定位 -->
+  <div class="section">
+    <div class="step"><span class="num">3</span><h2>你在哪儿</h2></div>
+    <button class="loc-btn" id="locBtn">📍 使用我的位置</button>
+    <div class="loc-status" id="locStatus">还没定位，可以点上面，也可以直接手动填。</div>
+    <button class="link" id="toggleManual" style="margin-top:8px">手动填写城市 / 地标 / 经纬度</button>
+    <div class="manual" id="manual">
+      <div class="grid2">
+        <div class="field"><label>城市</label><input id="city" placeholder="如 上海" /></div>
+        <div class="field"><label>地标 / 商圈</label><input id="keyword" placeholder="如 人民广场" /></div>
+      </div>
+      <div class="grid2">
+        <div class="field"><label>纬度</label><input id="lat" placeholder="如 31.2304" /></div>
+        <div class="field"><label>经度</label><input id="lng" placeholder="如 121.4737" /></div>
+      </div>
+      <div style="font-size:11.5px;color:var(--ink-soft);line-height:1.6">
+        填了城市 + 地标就直接查门店；只填经纬度的话，服务端会反查成城市再查。
+      </div>
+    </div>
+  </div>
+
+  <button class="cta" id="drawBtn">🎴 求今日麦门签</button>
+
+  <div id="result"></div>
+
+  <footer>
+    非官方作品 · 仅用于「1024 程序员节 · 麦当劳程序员创意开发大赛」技术演示<br />
+    餐品 / 价格 / 优惠券数据实时来自麦当劳 MCP Server，实际以门店与 App 为准
+  </footer>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ================================================================== */
+/*  状态                                                               */
+/* ================================================================== */
+const MOODS = [
+  { key: 'energetic', emoji: '⚡', label: '元气满满', hint: '吃饱才有力气' },
+  { key: 'tired',     emoji: '😮‍💨', label: '疲惫打工', hint: '高热量安慰' },
+  { key: 'emo',       emoji: '🌙', label: '深夜emo', hint: '甜食治愈' },
+  { key: 'date',      emoji: '💕', label: '约会',    hint: '双人分享' },
+  { key: 'celebrate', emoji: '🎉', label: '庆祝',    hint: '豪华犒赏' },
+  { key: 'whatever',  emoji: '🎲', label: '随便',    hint: '新品探索' },
+];
+
+let mood = 'energetic';
+let lastResult = null;
+let API = '';   // 后端地址，启动时自动探测
+
+const $ = (id) => document.getElementById(id);
+
+/**
+ * 探测后端地址。
+ * 场景 1：由 server/index.js 直接托管（http://localhost:3000）→ 同源，用相对路径。
+ * 场景 2：被当成静态文件在别的端口/file:// 打开 → 回落到 localhost:3000。
+ * 找不到就给一句人话提示，而不是干巴巴的 "Failed to fetch"。
+ */
+async function resolveApi() {
+  const here = location.origin && location.origin !== 'null' ? location.origin : null;
+  const cands = [here, 'http://localhost:3000', 'http://127.0.0.1:3000'].filter(Boolean);
+  const seen = new Set();
+  for (const base of cands) {
+    if (seen.has(base)) continue;
+    seen.add(base);
+    try {
+      const r = await fetch(base + '/api/health', { signal: AbortSignal.timeout(2500) });
+      const j = await r.json();
+      if (j && j.ok) { API = base; return { ok: true, base }; }
+    } catch { /* 换下一个候选 */ }
+  }
+  return { ok: false };
+}
+
+/* ================================================================== */
+/*  心情                                                               */
+/* ================================================================== */
+function renderMoods() {
+  $('moods').innerHTML = MOODS.map((m) => `
+    <button class="mood${m.key === mood ? ' on' : ''}" data-k="${m.key}">
+      <span class="emo">${m.emoji}</span>
+      <span class="lb">${m.label}</span>
+      <span class="hint">${m.hint}</span>
+    </button>`).join('');
+  document.querySelectorAll('.mood').forEach((el) => {
+    el.onclick = () => {
+      mood = el.dataset.k;
+      renderMoods();
+    };
+  });
+  $('moodTip').textContent = MOODS.find((m) => m.key === mood).hint;
+}
+
+/* ================================================================== */
+/*  预算                                                               */
+/* ================================================================== */
+function budgetNote(v) {
+  if (v < 22) return '够一份随心配';
+  if (v < 32) return '主食 + 小食，刚刚好';
+  if (v < 45) return '三件套没问题';
+  if (v < 65) return '可以吃得像样点';
+  if (v < 90) return '犒劳自己的档位';
+  return '今天不差钱';
+}
+$('budget').oninput = (e) => {
+  $('budgetVal').textContent = e.target.value;
+  $('budgetNote').textContent = budgetNote(+e.target.value);
+};
+
+/* ================================================================== */
+/*  定位                                                               */
+/* ================================================================== */
+$('toggleManual').onclick = () => $('manual').classList.toggle('show');
+
+$('locBtn').onclick = () => {
+  if (!navigator.geolocation) {
+    $('locStatus').innerHTML = '这台设备不支持定位，请<b>手动填写</b>。';
+    $('manual').classList.add('show');
+    return;
+  }
+  $('locStatus').textContent = '定位中…';
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      const { latitude: la, longitude: lo } = pos.coords;
+      $('lat').value = la.toFixed(6);
+      $('lng').value = lo.toFixed(6);
+      $('manual').classList.add('show');
+      // 调试信息只进控制台；页面上要看到的是「已定位·城市」
+      console.log('[geo] lat,lng =', la, lo);
+      // 顺便反查一下城市，回填到城市/地标里，用户一眼能看到「已定位·嘉兴南湖区」
+      fetch(API + '/api/geo?lat=' + la + '&lng=' + lo)
+        .then((r) => r.json())
+        .then((j) => {
+          if (j && j.ok) {
+            if (!$('city').value) $('city').value = j.city || '';
+            if (!$('keyword').value) $('keyword').value = j.keyword || '';
+            $('locStatus').innerHTML = `✓ 已定位 <b>${j.city || ''}${j.keyword && j.keyword !== j.city ? '·' + j.keyword : ''}</b>，可以求签了`;
+            console.log('[geo] reverse ->', j);
+          } else {
+            $('locStatus').innerHTML = '已拿到定位，可以求签了';
+            console.warn('[geo] reverse failed:', j && j.error);
+          }
+        })
+        .catch((e) => {
+          $('locStatus').innerHTML = '已拿到定位，可以求签了';
+          console.warn('[geo] reverse error', e);
+        });
+    },
+    (err) => {
+      const msg = { 1: '你拒绝了定位授权', 2: '定位不可用', 3: '定位超时' }[err.code] || '定位失败';
+      $('locStatus').innerHTML = `${msg}，请<b>手动填写经纬度或城市地标</b>。`;
+      $('manual').classList.add('show');
+    },
+    { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
+  );
+};
+
+/** 手动输入/反查之后，把"已定位·城市·地标"刷到状态栏（debug 数据进 console） */
+function refreshLocHint() {
+  const c = $('city').value.trim();
+  const k = $('keyword').value.trim();
+  if (c || k) {
+    const sep = (c && k && k !== c) ? '·' : '';
+    $('locStatus').innerHTML = `✓ 已定位 <b>${c}${sep}${k}</b>，可以求签了`;
+  } else if (!$('lat').value) {
+    $('locStatus').textContent = '还没定位，可以点上面，也可以直接手动填。';
+  }
+}
+['city', 'keyword'].forEach((id) => $(id).addEventListener('input', refreshLocHint));
+
+/* ================================================================== */
+/*  求签                                                               */
+/* ================================================================== */
+$('drawBtn').onclick = async () => {
+  const budget = +$('budget').value;
+  const payload = { mood, budget };
+
+  const city = $('city').value.trim();
+  const keyword = $('keyword').value.trim();
+  const lat = parseFloat($('lat').value);
+  const lng = parseFloat($('lng').value);
+  if (city) payload.city = city;
+  if (keyword) payload.keyword = keyword;
+  if (Number.isFinite(lat)) payload.lat = lat;
+  if (Number.isFinite(lng)) payload.lng = lng;
+
+  if (!payload.city && !payload.keyword && !Number.isFinite(lat)) {
+    toast('先定个位，或者手动填个城市和地标 🙏');
+    $('manual').classList.add('show');
+    return;
+  }
+
+  const btn = $('drawBtn');
+  btn.disabled = true;
+  btn.textContent = '🎴 正在翻牌…';
+  $('result').style.display = 'block';
+  $('result').innerHTML = '<div class="loading"><div class="spinner"></div>正在问门店、查菜单、算券…</div>';
+  $('result').scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  try {
+    const res = await fetch(API + '/api/luck', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    const data = await res.json();
+    if (!data.ok) throw new Error(data.error || '求签失败');
+    lastResult = data;
+    render(data);
+  } catch (e) {
+    const hint = /fetch|NetworkError|Failed/i.test(e.message)
+      ? `连不上后端（${API || '未探测到'}）。<br />请在项目目录执行 <b>npm start</b>，然后打开 <b>http://localhost:3000</b>；<br />如果已经开了，确认端口没有被别的程序占用。`
+      : esc(e.message) + '<br /><br />检查一下 .env 里有没有填 MCP_TOKEN。';
+    $('result').innerHTML = `<div class="section"><div class="empty">😵 求签失败<br /><br />${hint}</div></div>`;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '🎴 求今日麦门签';
+  }
+};
+
+/* ================================================================== */
+/*  渲染结果                                                           */
+/* ================================================================== */
+function render(d) {
+  const f = d.fortune || {};
+  const p = d.price || {};
+  const c = d.combo || {};
+  const parts = [];
+
+  parts.push(`
+    <div class="sig">
+      <div class="date">${esc(d.date)} · 麦门今日运势</div>
+      <div class="mood-tag">${esc(f.moodEmoji || '')} ${esc(f.moodLabel || '')}</div>
+      <div class="level">${esc(f.level || '吉')}</div>
+      <div class="line">${esc(f.line || '')}</div>
+      <div class="yz">
+        <div><span class="k">宜</span>${esc(f.yi || '')}</div>
+        <div><span class="k">忌</span>${esc(f.ji || '')}</div>
+      </div>
+    </div>`);
+
+  // 门店
+  if (d.store) {
+    const s = d.store;
+    parts.push(`
+      <div class="section">
+        <div class="step"><span class="num">📍</span><h2>离你最近的门店</h2></div>
+        <div class="store-row">
+          <span class="pin">🏪</span>
+          <div>
+            <div class="nm">${esc(s.name)}</div>
+            <div class="ad">${esc(s.address)}</div>
+            ${s.distance != null ? `<span class="dist">约 ${s.distance} 米</span>` : ''}
+            ${s.businessHours ? `<span class="dist">${esc(s.businessHours)}</span>` : ''}
+          </div>
+        </div>
+      </div>`);
+  }
+
+  // 推荐组合
+  if (c.main) {
+    const rows = [c.main, c.extra].filter(Boolean).map((it) => `
+      <div class="combo-item">
+        <img src="${imgUrl(it.image)}" alt="" onerror="this.style.visibility='hidden'" />
+        <div class="info">
+          <div class="nm">${esc(it.name)}${it.cardRequired ? ' <span style="font-size:10px;color:#96700C">（卡价已按原价计）</span>' : ''}</div>
+          <div class="tag">${esc((it.tags || []).join(' · ') || it.category || '')}</div>
+        </div>
+        <div class="pr">¥${it.price}${it.listPrice > it.price ? `<del>¥${it.listPrice}</del>` : ''}</div>
+      </div>`).join('');
+
+    parts.push(`
+      <div class="section">
+        <div class="step"><span class="num">🍟</span><h2>今日推荐组合</h2></div>
+        ${rows}
+        <div style="font-size:12px;color:var(--ink-soft);margin-top:10px;line-height:1.6">
+          ${esc(c.strategy || '')}　预算 ¥${d.budget}
+        </div>
+        <div class="price-box">
+          <div class="final"><small>券后约 </small>¥${p.final ?? '--'}</div>
+          <div class="meta">
+            原价 ¥${p.original ?? '--'}　<b>省了 ¥${p.saved ?? 0}</b>
+            ${p.fallback ? '<br /><span style="color:#96700C">（计价接口没返回，按菜单价估算）</span>' : ''}
+          </div>
+        </div>
+      </div>`);
+  }
+
+  // 券
+  const applied = d.coupons?.applied || [];
+  const claimable = d.coupons?.claimable || [];
+  const cpCards = applied.length
+    ? applied.map((x) => `<div class="cp"><div class="t">${esc(x.title)}</div><div class="s">用在「${esc(x.appliedTo)}」${x.tradeDateTime ? ' · 有效期至 ' + esc(x.tradeDateTime) : ''}</div></div>`).join('')
+    : '';
+  const claimCards = claimable.length
+    ? claimable.slice(0, 4).map((x) => `<div class="cp"><div class="t">${esc(x.title)}</div><div class="s">${esc(x.status || '可领取')} · 去 App 领了更省</div></div>`).join('')
+    : '';
+
+  if (cpCards || claimCards) {
+    parts.push(`
+      <div class="section">
+        <div class="step"><span class="num">🎟️</span><h2>最省券组合</h2></div>
+        ${cpCards || '<div class="empty">这个账号在该门店暂时没有可直接抵扣的券。<br />下面是麦麦省还能领的，领完再来求一次会更便宜 👇</div>'}
+        ${claimCards ? `<div style="font-size:11.5px;color:var(--ink-soft);margin:12px 0 6px">还能领：</div>${claimCards}` : ''}
+      </div>`);
+  }
+
+  // warnings
+  if ((d.warnings || []).length) {
+    parts.push(`
+      <div class="section">
+        <div class="warn">
+          <div class="t">⚠️ 这些步骤没完全跑通（不影响其它结果）</div>
+          <ul>${d.warnings.map((w) => `<li>${esc(w)}</li>`).join('')}</ul>
+        </div>
+      </div>`);
+  }
+
+  parts.push(`<button class="share-btn" id="shareBtn">🖼️ 生成签图分享</button>`);
+
+  $('result').innerHTML = parts.join('');
+  $('shareBtn').onclick = makeShareCard;
+}
+
+/* ================================================================== */
+/*  签图：canvas 750x1334                                              */
+/* ================================================================== */
+const W = 750, H = 1334;
+
+function imgUrl(u) {
+  if (!u) return '';
+  return API + '/api/img?url=' + encodeURIComponent(u);
+}
+
+function loadImage(src) {
+  return new Promise((resolve) => {
+    if (!src) return resolve(null);
+    const im = new Image();
+    im.crossOrigin = 'anonymous';
+    im.onload = () => resolve(im);
+    im.onerror = () => resolve(null);
+    im.src = src;
+  });
+}
+
+/** 按像素宽度做中文折行 */
+function wrapText(ctx, text, maxW) {
+  const out = [];
+  let line = '';
+  for (const ch of String(text || '')) {
+    if (ch === '\n') { out.push(line); line = ''; continue; }
+    if (ctx.measureText(line + ch).width > maxW && line) {
+      out.push(line);
+      line = ch;
+    } else {
+      line += ch;
+    }
+  }
+  if (line) out.push(line);
+  return out;
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+}
+
+async function makeShareCard() {
+  const d = lastResult;
+  if (!d) return;
+  const btn = $('shareBtn');
+  btn.disabled = true;
+  btn.textContent = '🖼️ 正在画…';
+  try {
+    const f = d.fortune || {};
+    const p = d.price || {};
+    const c = d.combo || {};
+    const cv = document.createElement('canvas');
+    cv.width = W; cv.height = H;
+    const ctx = cv.getContext('2d');
+    const FONT = '"PingFang SC","Microsoft YaHei","Helvetica Neue",Arial,sans-serif';
+
+    // 背景
+    const g = ctx.createLinearGradient(0, 0, 0, H);
+    g.addColorStop(0, '#DA291C');
+    g.addColorStop(1, '#8E1710');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, W, H);
+
+    // 装饰圆：往边角挪，别压到日期 / 文字
+    ctx.fillStyle = 'rgba(255,199,44,.12)';
+    ctx.beginPath(); ctx.arc(760, 50, 110, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = 'rgba(255,255,255,.07)';
+    ctx.beginPath(); ctx.arc(-10, 1260, 110, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = 'rgba(255,199,44,.10)';
+    ctx.beginPath(); ctx.arc(720, 1100, 90, 0, Math.PI * 2); ctx.fill();
+
+    let y = 62;
+    ctx.fillStyle = '#FFC72C';
+    ctx.font = `700 30px ${FONT}`;
+    ctx.textAlign = 'left';
+    ctx.fillText('🍔 麦门今日运势', 52, y);
+    // 日期加一道细文字阴影，免得被装饰圆压糊
+    ctx.textAlign = 'right';
+    ctx.fillStyle = 'rgba(255,255,255,.88)';
+    ctx.font = `500 21px ${FONT}`;
+    ctx.shadowColor = 'rgba(0,0,0,.35)';
+    ctx.shadowBlur = 6;
+    ctx.shadowOffsetY = 1;
+    ctx.fillText(d.date || '', W - 52, y);
+    ctx.shadowColor = 'transparent';
+    ctx.shadowBlur = 0;
+    ctx.shadowOffsetY = 0;
+
+    // 心情
+    y += 52;
+    ctx.textAlign = 'center';
+    ctx.fillStyle = 'rgba(255,255,255,.9)';
+    ctx.font = `600 22px ${FONT}`;
+    ctx.fillText(`${f.moodEmoji || ''} ${f.moodLabel || ''} · ${f.comboNote || ''}`, W / 2, y);
+
+    // 签等级
+    y += 128;
+    ctx.fillStyle = '#FFC72C';
+    ctx.font = `900 108px ${FONT}`;
+    ctx.fillText(f.level || '吉', W / 2, y);
+
+    // 签文
+    y += 66;
+    ctx.fillStyle = '#FFFFFF';
+    ctx.font = `500 33px ${FONT}`;
+    const lines = wrapText(ctx, f.line || '', W - 130);
+    for (const ln of lines) { ctx.fillText(ln, W / 2, y); y += 50; }
+
+    // 宜 / 忌
+    y += 26;
+    const bw = (W - 104 - 22) / 2;
+    ctx.fillStyle = 'rgba(255,255,255,.14)';
+    roundRect(ctx, 52, y, bw, 96, 16); ctx.fill();
+    roundRect(ctx, 52 + bw + 22, y, bw, 96, 16); ctx.fill();
+    ctx.font = `500 19px ${FONT}`;
+    ctx.fillStyle = 'rgba(255,255,255,.7)';
+    ctx.fillText('宜', 52 + bw / 2, y + 34);
+    ctx.fillText('忌', 52 + bw + 22 + bw / 2, y + 34);
+    ctx.fillStyle = '#FFFFFF';
+    ctx.font = `700 23px ${FONT}`;
+    ctx.fillText(f.yi || '', 52 + bw / 2, y + 70);
+    ctx.fillText(f.ji || '', 52 + bw + 22 + bw / 2, y + 70);
+
+    // 组合卡片
+    y += 132;
+    const items = [c.main, c.extra].filter(Boolean);
+    if (items.length) {
+      ctx.fillStyle = 'rgba(255,255,255,.10)';
+      roundRect(ctx, 52, y, W - 104, 62 + items.length * 118, 24); ctx.fill();
+
+      ctx.textAlign = 'left';
+      ctx.fillStyle = '#FFC72C';
+      ctx.font = `700 22px ${FONT}`;
+      ctx.fillText('今日推荐', 84, y + 44);
+      ctx.fillStyle = 'rgba(255,255,255,.6)';
+      ctx.font = `500 18px ${FONT}`;
+      ctx.fillText(`预算 ¥${d.budget}`, 84 + ctx.measureText('今日推荐').width + 130, y + 44);
+
+      let iy = y + 80;
+      for (const it of items) {
+        const im = await loadImage(imgUrl(it.image));
+        if (im) {
+          ctx.save();
+          roundRect(ctx, 84, iy, 92, 92, 14); ctx.clip();
+          ctx.drawImage(im, 84, iy, 92, 92);
+          ctx.restore();
+        } else {
+          ctx.fillStyle = 'rgba(255,255,255,.16)';
+          roundRect(ctx, 84, iy, 92, 92, 14); ctx.fill();
+          ctx.fillStyle = 'rgba(255,255,255,.5)';
+          ctx.font = `600 15px ${FONT}`;
+          ctx.textAlign = 'center';
+          ctx.fillText('🍔', 130, iy + 56);
+          ctx.textAlign = 'left';
+        }
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = `700 27px ${FONT}`;
+        const nm = wrapText(ctx, it.name, 400)[0] || '';
+        ctx.fillText(nm, 196, iy + 42);
+        ctx.fillStyle = 'rgba(255,255,255,.55)';
+        ctx.font = `500 18px ${FONT}`;
+        ctx.fillText((it.tags || []).slice(0, 3).join(' · '), 196, iy + 74);
+        ctx.textAlign = 'right';
+        ctx.fillStyle = '#FFC72C';
+        ctx.font = `800 30px ${FONT}`;
+        ctx.fillText(`¥${it.price}`, W - 84, iy + 52);
+        if (it.listPrice > it.price) {
+          const listTxt = `¥${it.listPrice}`;
+          ctx.fillStyle = 'rgba(255,255,255,.65)';
+          ctx.font = `400 18px ${FONT}`;
+          ctx.fillText(listTxt, W - 84, iy + 80);
+          // 删除线划在文字正中
+          const w = ctx.measureText(listTxt).width;
+          ctx.strokeStyle = 'rgba(255,255,255,.75)';
+          ctx.lineWidth = 1.6;
+          ctx.beginPath();
+          ctx.moveTo(W - 84 - w, iy + 80 - 6);
+          ctx.lineTo(W - 84, iy + 80 - 6);
+          ctx.stroke();
+        }
+        ctx.textAlign = 'left';
+        iy += 118;
+      }
+      y = iy + 4;
+    }
+
+    // 价格
+    y += 74;
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#FFFFFF';
+    ctx.font = `500 22px ${FONT}`;
+    ctx.fillText('券后预估', W / 2, y);
+    y += 62;
+    ctx.fillStyle = '#FFC72C';
+    ctx.font = `900 74px ${FONT}`;
+    ctx.fillText(`¥${p.final ?? '--'}`, W / 2, y);
+    y += 44;
+    ctx.fillStyle = 'rgba(255,255,255,.75)';
+    ctx.font = `500 21px ${FONT}`;
+    ctx.fillText(`原价 ¥${p.original ?? '--'}　省了 ¥${p.saved ?? 0}`, W / 2, y);
+
+    // 券
+    const applied = (d.coupons && d.coupons.applied) || [];
+    y += 56;
+    if (applied.length) {
+      ctx.fillStyle = '#FFC72C';
+      ctx.font = `600 20px ${FONT}`;
+      ctx.fillText('🎟️ ' + applied.map((a) => a.title).join(' + ').slice(0, 40), W / 2, y);
+    } else {
+      ctx.fillStyle = 'rgba(255,255,255,.78)';
+      ctx.font = `500 19px ${FONT}`;
+      ctx.fillText('该门店暂无可抵扣券 · 已按菜单最优价搭配', W / 2, y);
+    }
+
+    // 门店
+    y += 54;
+    if (d.store) {
+      ctx.fillStyle = 'rgba(255,255,255,.96)';
+      ctx.font = `700 22px ${FONT}`;
+      ctx.fillText('🏪 ' + (d.store.name || ''), W / 2, y);
+      y += 36;
+      ctx.fillStyle = 'rgba(255,255,255,.78)';
+      ctx.font = `500 18px ${FONT}`;
+      ctx.fillText(d.store.address || '', W / 2, y);
+    }
+
+    // 页脚
+    ctx.fillStyle = 'rgba(255,255,255,.72)';
+    ctx.font = `500 17px ${FONT}`;
+    ctx.fillText('麦门今日运势 · 非官方作品 · 数据来自麦当劳 MCP', W / 2, H - 46);
+
+    // 导出
+    const url = cv.toDataURL('image/png');
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `麦门今日运势_${d.date || ''}_${f.level || ''}.png`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    toast('签图已生成，去相册看看 📱');
+  } catch (e) {
+    toast('画签图失败：' + e.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '🖼️ 生成签图分享';
+  }
+}
+
+/* ================================================================== */
+function esc(s) {
+  return String(s ?? '').replace(/[&<>"']/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+}
+let toastTimer = null;
+function toast(msg) {
+  const el = $('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2400);
+}
+
+/* init */
+try {
+  renderMoods();
+  $('budgetNote').textContent = budgetNote(40);
+  console.log('[init] ok, moods rendered, API probing...');
+} catch (e) {
+  console.error('[init] failed', e);
+  // 把错误直接画到页面上，调试时一眼能看到
+  const s = document.createElement('div');
+  s.style.cssText = 'position:fixed;left:8px;right:8px;top:8px;background:#FFE7E2;color:#9B1A12;padding:10px;border-radius:8px;font:12px monospace;z-index:9999;white-space:pre-wrap';
+  s.textContent = '页面脚本初始化失败：' + (e && e.message || e);
+  document.body.appendChild(s);
+}
+
+resolveApi().then((r) => {
+  if (r.ok) {
+    console.log('[api] connected to', r.base);
+  } else {
+    console.warn('[api] no backend found');
+    $('locStatus').innerHTML = `⚠️ 没找到后端服务。请在项目目录执行 <b>npm start</b>，再打开 <b>http://localhost:3000</b>。`;
+  }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+node_modules/
+npm-debug.log*
+yarn-error.log*
+
+# ⚠️ 真实 Token 绝不入库
+.env
+.env.local
+.env.*.local
+
+# 编辑器和系统垃圾
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
+
+# 日志与产物
+logs/
+*.log
+dist/
+coverage/
